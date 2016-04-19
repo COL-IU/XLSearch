@@ -1,0 +1,67 @@
+param = dict(
+	useAIon=True,
+	verbose=False,
+	chargePreXlinkIons=[1, 3],
+	chargePostXlinkIons=[2, 5],
+	basepeakint = 100.0,
+	dynamicrange = 0.001,
+	missedsites = 2,
+	minlength = 4,
+	maxlength = 51,
+	modRes = '',
+	modMass = 0.0,
+	linkermass = 136.10005,
+	ms1tol = dict(measure='ppm', val=5),
+	ms2tol = dict(measure='da', val=0.01),
+	minmz = 200,
+	maxmz = 2000,
+	mode = 'conservative',
+	patternstring = '^[ACDEFGHIKLMNPQRSTVWY]*K[ACDEFGHIKLMNPQRSTVWY]+$',
+	fixedMod = [],
+	neutralloss=dict(
+		h2oLoss=dict(
+			mass=-18.010565, 
+			aa=set('ACDEFGHIKLMNPQRSTVWY')),
+		nh3Loss=dict(
+			mass=-17.026549,
+			aa=set('ACDEFGHIKLMNPQRSTVWY')),
+		h2oGain=dict(
+			mass=18.010565,
+			aa=set('ACDEFGHIKLMNPQRSTVWY'))))
+
+mass = dict(
+	A=71.037114,
+	R=156.101111,
+	N=114.042927,
+	D=115.026943,
+	C=103.009184,
+	E=129.042593,
+	Q=128.058578,
+	G=57.021464,
+	H=137.058912,
+	I=113.084064,
+	L=113.084064,
+	K=128.094963,
+	M=131.040485,
+	F=147.068414,
+	P=97.052764,
+	S=87.032028,
+	T=101.047678,
+	W=186.079313,
+	Y=163.063329,
+	V=99.068414,
+	Hatom=1.007825032,
+	Oatom=15.99491462,
+	neutronmass = 1.008701,
+	BIonRes=1.0078246,
+	AIonRes=-26.9870904,
+	YIonRes=19.0183888,
+	isotopeInc = [1.008701/4, 1.008701/3, 1.008701/2, 1.008701/1])
+
+modification = dict(
+	position=[],
+	deltaMass=[])
+for i in range(len(param['fixedMod'])):
+	aa = param['fixedMod'][i][0]
+	delta = param['fixedMod'][i][1]
+	mass[aa] += delta
