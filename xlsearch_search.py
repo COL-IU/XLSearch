@@ -27,7 +27,7 @@ from utility import *
 from index import EnumIndexBuilder
 from match import Match
 
-print 'XLSearch, version 1.0'
+print 'XLSearch, version 1.1'
 print 'Copyright of School of Informatics and Computing, Indiana University'
 print 'Current time: %s' % ctime() 
 
@@ -39,13 +39,11 @@ print 'Reading parameters done!'
 
 print '\nReading MSMS spectra files from directory: %s...' % param['ms_data']
 spec_dict = read_spec(param['ms_data'], param, mass)
-pickle.dump(spec_dict, file('spectra.pickle', 'w'))
 print 'Total number of spectra: %d' % len(spec_dict)
 print 'Reading MSMS spectra files done!'
 
 if param['deisotope'] == True:
 	print '\nDeisotoping MSMS spectra...'
-	spec_dict = pickle.load(file('spectra.pickle'))
 	deisotoped = dict()
 	titles = spec_dict.keys()
 
@@ -56,8 +54,6 @@ if param['deisotope'] == True:
 		(one, align) = spec_dict[title].deisotope(mass, param['ndeisotope'], ms2tol)
 		deisotoped[title] = one
 
-	pickle.dump(deisotoped, file('deisotoped.pickle', 'w'))
-	deisotoped = pickle.load(file('deisotoped.pickle'))
 	spec_dict = deisotoped
 
 	print 'Deisotoping MSMS spectra done!'
@@ -65,17 +61,13 @@ if param['deisotope'] == True:
 
 print '\nBuilding index for all possible inter-peptide cross-links...'
 index = EnumIndexBuilder(param['database'], spec_dict, mass, param)
-pickle.dump(index, file('index.pickle', 'w'))
-index = pickle.load(file('index.pickle'))
 print 'Building index done!'
 print 'Current time: %s' % ctime()
 
 print '\nComputing features for candidate PSMs for query spectra...'
 results = []
-titles = []
-for title in index.search_index.keys():
-	if len(index.search_index[title]) != 0:
-		titles.append(title)
+titles = spec_dict.keys()
+
 length = len(titles)
 print 'Total number of spectra to be searched: %d' % length
 for i in range(0, length):
@@ -83,8 +75,9 @@ for i in range(0, length):
 	sys.stdout.flush()
 	title = titles[i]
 	result = get_matches_per_spec(mass, param, index, title)
-	result = [title, result]
-	results.append(result)
+	if len(result) > 0:	
+		result = [title, result]
+		results.append(result)
 print 'Computing features done!\n'
 print 'Current time: %s' % ctime()
 

@@ -90,17 +90,16 @@ def get_marginal(p21, p11, p12, p22):
 def get_matches_per_spec(mass, param, index, title):
 	spec_dict = index.spec_dict
 	unique_pep = index.unique_pep[0]
-	prec_mass_pep_index_tuple = index.prec_mass_pep_index_tuple
-	search_index = index.search_index
+#	search_index = index.search_index
 	x_residue = param['x_residue']
 
-	index_list = search_index[title]
+	index_list = index.get_candidates(title)
 	spec = spec_dict[title]
 
 	matches = []
-	for i in index_list:
-		index1 = prec_mass_pep_index_tuple[1][i]
-		index2 = prec_mass_pep_index_tuple[2][i]
+	for i in range(len(index_list)):
+		index1 = index_list[i][0]
+		index2 = index_list[i][1]
 		
 		pep1 = unique_pep[index1]
 		pep2 = unique_pep[index2]
@@ -845,8 +844,8 @@ def filter_by_fdr(top_hits, decoy_string, cutoff, is_unique):
 
 		is_tar = [[], []]
 		is_dec = [[], []]
-
-		pep_str = [top_hits[i][0][0], top_hits[i][0][1], str(top_hits[i][3])]
+		pep_str = [top_hits[i][0][0], top_hits[i][0][1]]
+#		pep_str = [top_hits[i][0][0], top_hits[i][0][1], str(top_hits[i][3])]
 		pep_str = '_'.join(pep_str)
 
 		for part in pro1:
@@ -912,6 +911,10 @@ def filter_by_fdr(top_hits, decoy_string, cutoff, is_unique):
 		decdec_cum_count.append(decdec_count)
 		xl_type.append(xl)
 
+#	tmp = enumerate(xl_type)
+#	tmp = filter(lambda x : x[1] == 'target-decoy' or x[1] == 'decoy-decoy', tmp)
+#	print tmp[0][0]
+
 	fdr_intra = []
 	for i in range(len(top_hits)):
 		if intra_cum_count[i] != 0:
@@ -927,7 +930,7 @@ def filter_by_fdr(top_hits, decoy_string, cutoff, is_unique):
 			fdr_inter.append([fdr, i])
 		else:
 			fdr_inter.append([float(sys.maxint), i])
-
+#	pickle.dump([fdr_intra, fdr_inter], file('save.pickle', 'w'))
 	fdr_intra = filter(lambda x : x[0] <= cutoff, fdr_intra)
 	fdr_inter = filter(lambda x : x[0] <= cutoff, fdr_inter)
 
@@ -946,6 +949,9 @@ def filter_by_fdr(top_hits, decoy_string, cutoff, is_unique):
 	for i in range(len(top_hits)):
 		if xl_type[i] == 'interxlink' and i <= max_index_inter:
 			inter.append(top_hits[i])
+
+	print '#intra = %d, #TD = %d, #DD = %d' % (intra_cum_count[max_index_intra], tardec_cum_count[max_index_intra], decdec_cum_count[max_index_intra])
+	print '#inter = %d, #TD = %d, #DD = %d' % (inter_cum_count[max_index_inter], tardec_cum_count[max_index_inter], decdec_cum_count[max_index_inter]) 
 
 	unique_intra = set()
 	f = open('intra' + str(cutoff), 'w')
