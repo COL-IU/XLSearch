@@ -31,7 +31,10 @@ class MZXMLReader:
 			info = children[i].getchildren()
 			for j in range(0, len(info)):
 				if info[j].tag[-11:] == 'precursorMz':
-					ch = int(info[j].attrib['precursorCharge'])
+					if 'precursorCharge' in info[j].attrib :
+						ch = int(info[j].attrib['precursorCharge'])
+					else:
+						ch = 4
 					prec_mz = float(info[j].text)
 				elif info[j].tag[-5:] == 'peaks':
 					base64Peaklist = info[j].text
